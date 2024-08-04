@@ -3,8 +3,10 @@ import {
   Entity,
   PrimaryGeneratedColumn,
   CreateDateColumn,
+  ManyToOne,
 } from 'typeorm';
 import { TaskStatus } from './task-status.enum';
+import { Tasklist } from 'src/task-list/task-list.entity';
 
 @Entity()
 export class Task {
@@ -25,4 +27,7 @@ export class Task {
 
   @Column()
   status: TaskStatus;
+
+  @ManyToOne((type) => Tasklist, (tasklist) => tasklist.task, { eager: false })
+  tasklist: Tasklist;
 }
