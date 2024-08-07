@@ -9,11 +9,14 @@ import { Repository } from 'typeorm';
 import { Tasklist } from './task-list.entity';
 import { CreateTasklistDto } from './dto/create-task-list.dto';
 import { User } from 'src/auth/user.entity';
+import { Task } from 'src/tasks/task.entity';
 @Injectable()
 export class TaskListService {
   constructor(
     @InjectRepository(Tasklist)
     private tasklistRepository: Repository<Tasklist>,
+    @InjectRepository(Task)
+    private taskRepository: Repository<Task>,
   ) {}
   async getTasklist(user: User): Promise<Tasklist[]> {
     const query = this.tasklistRepository.createQueryBuilder('tasklist');
@@ -53,9 +56,11 @@ export class TaskListService {
   }
 
   async deleteTasklist(id: string, user: User): Promise<void> {
+    await this.taskRepository.delete({ tasklist: { id } });
+
     const result = await this.tasklistRepository.delete({ id, user });
     if (result.affected === 0) {
-      throw new NotFoundException();
+      throw new NotFoundException(`this TaskList with ID "${id}" not found`);
     }
   }
 }
